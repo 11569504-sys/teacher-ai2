@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>教學 AI 工具箱</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#f6f4ee;--card:#fff;--ink:#2b2a27;--mute:#77736a;--line:#e4dfd2;--acc:#3f7d6b;--acc-ink:#fff;--chip:#eef3ef}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1b1c1a;--card:#262826;--ink:#ecebe6;--mute:#a09c92;--line:#3a3c38;--acc:#6bb59f;--acc-ink:#12201b;--chip:#2e332f}}
+:root[data-theme="dark"]{--bg:#1b1c1a;--card:#262826;--ink:#ecebe6;--mute:#a09c92;--line:#3a3c38;--acc:#6bb59f;--acc-ink:#12201b;--chip:#2e332f}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;line-height:1.65}
+header{background:var(--acc);color:var(--acc-ink);padding:30px 16px 24px;text-align:center}
+header h1{margin:0 0 4px;font-size:1.7rem}header p{margin:0;opacity:.9}
+main{max-width:860px;margin:0 auto;padding:18px 16px 48px}
+.tabs{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-bottom:16px}
+.tab{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:10px 8px;border-radius:12px;cursor:pointer;font:inherit;font-size:.88rem;text-align:center}
+.tab.on{background:var(--acc);color:var(--acc-ink);border-color:var(--acc)}
+.tab span{display:block;font-size:1.3rem}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:14px}
+.card h2{margin:0 0 2px;font-size:1.25rem}.desc{color:var(--mute);margin:0 0 14px;font-size:.93rem}
+label{display:block;font-weight:600;margin:12px 0 5px;font-size:.92rem}
+input,textarea,select{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit}
+textarea{min-height:90px;resize:vertical}
+button.go{width:100%;margin-top:16px;padding:13px;border:0;border-radius:12px;background:var(--acc);color:var(--acc-ink);font:inherit;font-weight:700;font-size:1.05rem;cursor:pointer}
+button.go:disabled{opacity:.6;cursor:wait}
+.out{min-height:40px;overflow-x:auto}.out.pre{white-space:pre-wrap}
+.out table{border-collapse:collapse;width:100%;min-width:480px}
+.out th,.out td{border:1px solid var(--line);padding:6px 8px;text-align:center;font-size:.9rem}
+.out th{background:var(--chip)}
+.out h3,.out h4{margin:14px 0 6px}
+.out ul{margin:4px 0;padding-left:1.3em}
+.out.tree ul{border-left:2px solid var(--acc);margin-left:4px}
+.out.tree>ul{border:0;padding-left:0;list-style:none}
+.out.tree li{margin:3px 0}
+.bar{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.bar button{padding:8px 14px;border:1px solid var(--line);background:var(--chip);color:var(--ink);border-radius:10px;cursor:pointer;font:inherit}
+details{margin-top:12px;color:var(--mute);font-size:.88rem}
+details pre{white-space:pre-wrap;background:var(--bg);border:1px solid var(--line);padding:10px;border-radius:10px;color:var(--ink);font-family:inherit}
+.warn{color:#b3472f;font-size:.9rem;margin:8px 0 0}
+.hint{color:var(--mute);font-size:.82rem;margin-top:4px}
+#proj{position:fixed;inset:0;background:#1f3a2e;color:#f4f1e6;z-index:99;display:none}
+#proj.on{display:block}
+#pt{height:100%;margin:0;padding:4vh 4vw;writing-mode:vertical-lr;text-orientation:upright;overflow-x:auto;overflow-y:hidden;white-space:pre-wrap;line-height:1.6;letter-spacing:.08em;font-family:"標楷體","DFKai-SB","Noto Serif TC",serif}
+#pc{position:fixed;top:10px;right:12px;display:flex;gap:6px;z-index:100}
+#pc button{padding:6px 12px;border-radius:8px;border:1px solid #f4f1e655;background:#00000055;color:#f4f1e6;font:inherit;cursor:pointer}
+#tool.pa-on{padding:0;border:0;background:transparent}
+.pa{--b:#0c0c0e;--bd:#2e2e33;--tx:#f4f3f8;--mu:#9a98a6;--ac:#a9a6d6;--aci:#1a1830;--sg:#101012;--cb:#17171a;
+ background:linear-gradient(135deg,#1b1b1e,#2b2b30 45%,#0d0d0f);color:var(--tx);border:1px solid #34343a;border-radius:20px;padding:20px}
+.pa[data-th=light]{--b:#fff;--bd:#d9d6e6;--tx:#25233a;--mu:#7a7790;--ac:#7f7bc4;--aci:#fff;--sg:#ecebf5;--cb:#fff;background:linear-gradient(135deg,#f4f3fb,#e6e4f4);border-color:#d6d3ea}
+.pah{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.pat{font-size:1.25rem;font-weight:700}
+#pth{width:40px;height:40px;border-radius:50%;border:1px solid var(--bd);background:var(--sg);color:var(--tx);cursor:pointer;font-size:1.1rem}
+.seg{display:flex;gap:4px;background:var(--sg);border:1px solid var(--bd);border-radius:14px;padding:5px;margin-bottom:14px}
+.seg button{flex:1;padding:11px 6px;border:0;border-radius:10px;background:transparent;color:var(--mu);font:inherit;font-weight:700;cursor:pointer}
+.seg button.on{background:var(--ac);color:var(--aci)}
+.sc{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;margin-bottom:14px}
+.sc[hidden]{display:none}
+.sb{padding:10px 6px;border-radius:12px;border:1px solid var(--bd);background:var(--cb);color:var(--tx);font:inherit;font-size:.9rem;cursor:pointer}
+.sb.on{background:var(--ac);color:var(--aci);border-color:var(--ac);font-weight:700}
+.pl{font-weight:700;margin:6px 0 8px;display:block}
+.pa textarea{background:var(--b);border-color:var(--bd);color:var(--tx);min-height:140px;border-radius:14px}
+.pa .go{background:linear-gradient(180deg,#55555c,#2a2a2f);color:#fff;border:2px solid #8d8d96;border-radius:999px;margin-top:16px}
+.pa[data-th=light] .go{background:linear-gradient(180deg,#8f8bd2,#7370b8);border-color:#6a67ad}
+.pa details{color:var(--mu)}.pa details pre{background:var(--b);border-color:var(--bd);color:var(--tx)}
+.foot{color:var(--mute);font-size:.85rem;text-align:center;margin-top:20px}
+</style>
+</head>
+<body>
+<header><h1>🧰 教學 AI 工具箱</h1><p>十個為教師日常工作設計的 AI 助手（自製）</p></header>
+<main>
+<div class="tabs" id="tabs"></div>
+<div class="card" id="tool"></div>
+<div class="card" id="resCard" hidden>
+  <div class="out" id="out"></div>
+  <div class="bar"><button id="copy">📋 複製</button><button id="again">🔄 重新產生</button><button id="pj" hidden>📺 投影到大螢幕</button></div>
+</div>
+<p class="foot">⚠️ 本工具使用第三方 AI 服務，輸入內容可能被服務商保留。請勿輸入學生真實姓名、身分證字號等個資（可用代號）。AI 生成內容請老師檢視後再使用。</p>
+<p class="foot" id="sv" hidden><a id="svl" target="_blank" rel="noopener">📋 填寫使用回饋問卷</a></p>
+</main>
+<div id="proj"><div id="pc"><button id="pm">A－</button><button id="pp">A＋</button><button id="px">✕ 關閉</button></div><div id="pt"></div></div>
+<script>
+const T=[
+{id:"cm",i:"📝",n:"期末評語小幫手",d:"輸入學生特質與事例，產生溫暖具體的期末評語。",md:0,
+ f:[["name","學生姓名／暱稱","text"],["good","優點與表現","area","例：學習認真、樂於助人"],["grow","待加強之處","area","例：需更專心、作業常遲交"],["ev","具體事例（越具體越好）","area"],["tone","語氣","sel",["溫暖鼓勵","正式簡潔","親切活潑","期許勉勵"]],["len","字數","sel",["約80字","約150字","約250字"]]],
+ r:"你是資深的台灣國小導師，為學生撰寫期末評語。先肯定優點，待加強處以正向建設性方式表達，最後以期許收尾；避免負面標籤與比較其他學生。"},
+{id:"pa",i:"💬",n:"回覆家長萬事通",d:"AI 判斷情境或手動選擇情境，產生得體、有同理心的家長回覆。",md:0,
+ f:[["mode","模式","text"],["sc","手動選擇的情境","text"],["msg","描述現況或貼上訊息","area"]],
+ r:"你是溫和專業的台灣國小導師，要回覆家長，成品要能直接貼到 Line。若模式為「AI智慧判斷情境」，請先從下列清單判斷最符合的情境（可複選主要一項，無法歸類則為「其他」）；若模式為「手動選擇情境」，以所選情境為準。輸出三段：【情境判斷】（情境名稱與一句理由）、【回覆建議】（150 至 250 字，口語有禮、分段清楚）、【溝通小提醒】（2 至 3 點，如是否建議電話聯絡、需留存紀錄、需向主任回報）。各情境的回覆重點：孩子受傷＝說明經過、已做處置與目前狀況，是否送醫，請家長留意觀察，不推責；突發疾病＝說明症狀與處置，建議就醫與接送，說明請假與返校安排；同儕衝突＝保持中立只陳述事實，不洩漏或指責其他學生姓名，說明已溝通與後續觀察；情緒困擾＝以同理開頭，描述具體觀察，邀請家長分享孩子在家狀況，共同支持，必要時提輔導室；嚴重違規＝客觀陳述事實與規範，說明處理程序與孩子反省，強調教育目的與後續追蹤；忘記物品＝語氣輕鬆，說明缺漏物品與期限及補救方式；學習進度落後＝先肯定優點，具體說明落後處與在校協助，建議在家可配合的小步驟；3C/網路問題＝說明觀察，不指責家長，提供在家可行的約定建議；需家長到校＝說明原因避免家長焦慮，提供時段選項與會談重點；回應家長訊息＝先同理感謝，逐點回應提問，說明能做與不能做的，約定後續聯繫方式。通用原則：不承諾超出資料的事、不編造事實，資料不足處以【　】標示。"},
+{id:"of",i:"🏛️",n:"學校公文撰寫",d:"依公文格式產生主旨、說明、辦法的草稿。",md:1,
+ f:[["type","公文類型","sel",["函","書函","簽","開會通知單","公告"]],["to","受文者／機關","text"],["pt","主旨重點","area"],["ex","背景與說明事項","area"],["ask","希望對方配合的事項","area"]],
+ r:"你是熟悉台灣機關學校公文格式的行政人員。請依所選類型輸出公文草稿，包含：主旨（一句話、單句不分段）、說明（條列，用「一、二、三、」）、辦法或擬辦（如適用）。用詞精簡正式，日期用民國年。資料不足處以【　】標示請使用者補填，不可自行編造文號、日期。"},
+{id:"nt",i:"📣",n:"生成通知單與 Line 訊息",d:"輸入活動資訊，同步產出紙本通知單與 Line 群組訊息。",md:1,
+ f:[["ev","活動名稱","text"],["info","時間、地點、對象","area"],["need","需要準備或配合的事項","area","例：帶水壺、簽名回條、費用 100 元"],["out","輸出形式","sel",["通知單與Line訊息都要","只要紙本通知單","只要Line訊息"]]],
+ r:"你是台灣國小導師。依輸出形式產出：「紙本通知單」（含稱謂、事由、時間地點、注意事項、回條）與「Line 訊息」（簡短、分行、適度使用 emoji、重點醒目）。資料不足處以【　】標示。"},
+{id:"tx",i:"📖",n:"國語文本分析與學習單",d:"貼上課文，分析重點與修辭，並產出學習單。",md:1,
+ f:[["gr","年級","sel",["一年級","二年級","三年級","四年級","五年級","六年級"]],["tx","課文或文章內容（可貼文字，或改用上傳）","area"],["fl","上傳圖片或檔案（選填，可多選）","file"],["wk","學習單題型","sel",["基礎理解＋修辭","閱讀理解提問","仿寫與創作","綜合（三類都要）"]]],
+ r:"你是台灣國小國語文教師。請輸出：一、文本分析（主旨、段落大意、重點生字語詞、修辭手法並引用文中句子舉例）；二、學習單（依題型出題，題目由易到難，難度符合年級）；三、參考答案。"},
+{id:"tt",i:"📅",n:"課表美編專家",d:"貼上課表文字，整理成清楚的表格與可愛的提醒。",md:1,
+ f:[["cl","班級／學期","text"],["tb","課表內容（可貼文字，或改用上傳）","area","例：週一 1國語 2數學 3體育 4社會…"],["fl","上傳圖片或檔案（選填，可多選）","file"],["st","風格","sel",["清爽簡潔","可愛活潑","正式"]]],
+ r:"你是課表整理專家。請把使用者提供的課表整理成 Markdown 表格：欄為星期一至星期五，列為節次，空堂留空，必要時加上午休行。表格後附「小提醒」兩到三行（如體育課記得帶運動服）。風格依使用者選擇，可加入適量 emoji。不可編造未提供的課程。"},
+{id:"bb",i:"🧑‍🏫",n:"智慧黑板聯絡簿",d:"輸入今日作業與提醒，產生直式、由左至右的黑板聯絡簿，可一鍵投影到大螢幕。",md:0,
+ f:[["dt","日期","text","例：10/6（週二）"],["hw","各科作業與進度","area"],["rm","提醒與注意事項","area","例：明天帶美勞用品、繳交回條"],["gr","年級","sel",["低年級（用字簡單）","中年級","高年級"]]],
+ r:"你是台灣國小導師，要產生可以抄在黑板上的聯絡簿。格式為直式書寫：每一行會成為黑板上的一直行，每行不超過 14 個字（超過請拆成兩行）；以國字編號（一、二、三），日期與數字都用國字書寫（例如「十月六日」）；不要使用 emoji、英文縮寫與符號圖案；第一行為日期，之後依序為各科作業、提醒事項，最後一行為一句鼓勵的話。低年級用字簡單。純文字輸出。"},
+{id:"sl",i:"🎞️",n:"教案轉簡報工具",d:"貼上教案，轉成逐頁的簡報大綱與講稿備註。",md:1,
+ f:[["lp","教案內容（可貼文字，或改用上傳）","area"],["fl","上傳圖片或檔案（選填，可多選）","file"],["n","簡報頁數","sel",["約5頁","約8頁","約12頁"]],["au","授課對象","text","例：國小五年級"]],
+ r:"你是教學簡報設計師。請把教案轉成逐頁簡報，每頁格式：「### 第N頁：標題」，接著 3 至 5 個精簡要點（每點不超過 20 字）、「建議視覺」一行（圖片或版面建議）、「講稿備註」一到兩句。第一頁為封面，最後一頁為總結或作業。順序符合教學流程（引起動機、發展活動、綜合活動）。"},
+{id:"me",i:"📰",n:"媒體素養教學故事",d:"產生貼近學生生活的短篇故事與討論問題。",md:1,
+ f:[["gr","年級","sel",["低年級","中年級","高年級"]],["tp","媒體素養主題","sel",["辨識假訊息","網路霸凌與留言","廣告與行銷手法","個資與隱私","AI 生成內容","短影音與沉迷"]],["ch","角色或情境（選填）","text","例：主角是愛玩手機遊戲的小宇"],["len","故事長度","sel",["約300字","約500字","約800字"]]],
+ r:"你是兒童故事作家與媒體素養教師。請創作原創故事，情節貼近學生生活、結局不說教而引導思考。輸出：故事標題、故事內容、三到五題討論問題（由事實題到思辨題）、一段給老師的教學小提醒。語言符合年級。"},
+{id:"mm",i:"🧠",n:"教材轉「簡單」心智圖",d:"把教材整理成層次分明、一眼看懂的心智圖。",md:1,tree:1,
+ f:[["tx","教材內容（可貼文字，或改用上傳）","area"],["fl","上傳圖片或檔案（選填，可多選）","file"],["gr","年級","sel",["低年級","中年級","高年級"]],["dp","層數","sel",["2層（最簡單）","3層"]]],
+ r:"你是教材整理專家。請把教材轉成心智圖階層大綱。格式嚴格：第一行為中心主題（用「- 」開頭），主分支用兩個空格縮排的「- 」，子分支再多縮排兩個空格。每個節點不超過 10 個字、用關鍵詞不用完整句、主分支 3 到 6 個。可在節點前加一個貼切的 emoji。除了大綱不要輸出任何其他文字。"}
+];
+const COMMON="通用規則：使用台灣慣用的繁體中文；只根據提供的資料書寫，不可捏造事實；不要輸出開場白或結語說明。";
+const $=id=>document.getElementById(id);
+const API_URL="https://long-mountain-2a65.11569504.workers.dev";
+const SURVEY_URL="";
+let cur=T[0],last="";
+const tabs=$('tabs');
+T.forEach(t=>{const b=document.createElement('button');b.className='tab';b.dataset.id=t.id;b.innerHTML=`<span>${t.i}</span>${t.n}`;b.onclick=()=>pick(t);tabs.appendChild(b)});
+function esc(s){return s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))}
+function pick(t){
+  $('tool').classList.toggle('pa-on',t.id==='pa');
+  cur=t;$('resCard').hidden=true;$('pj').hidden=t.id!=='bb';
+  [...tabs.children].forEach(b=>b.classList.toggle('on',b.dataset.id===t.id));
+  if(t.id==='pa'){paUI();return}
+  let h=`<h2>${t.i} ${t.n}</h2><p class="desc">${t.d}</p>`;
+  t.f.forEach(f=>{const[k,l,ty,x]=f;h+=`<label for="f_${k}">${l}</label>`;
+    if(ty==="file")h+=`<input type="file" id="f_${k}" accept="image/*,.pdf,.txt,.md" multiple><div class="hint">最多 3 個；支援圖片、PDF、TXT（Word 請先另存 PDF）。圖片會在瀏覽器壓縮後才送出。請避免上傳含學生姓名或臉部的照片。</div>`;
+    else if(ty==="sel")h+=`<select id="f_${k}">${x.map(o=>`<option>${o}</option>`).join('')}</select>`;
+    else if(ty==="area")h+=`<textarea id="f_${k}" placeholder="${x||''}"></textarea>`;
+    else h+=`<input type="text" id="f_${k}" placeholder="${x||''}">`});
+  h+=`<button class="go" id="go">✨ 開始生成</button><p class="warn" id="err" hidden></p>
+  <details><summary>🔍 查看這個工具的提示詞設計</summary><pre>${esc(t.r+"\n\n"+COMMON)}</pre></details>`;
+  $('tool').innerHTML=h;$('go').onclick=gen;
+}
+function md(s,tree){
+  const lines=esc(s).split('\n');let o='',inT=0,stack=[];
+  const closeL=to=>{while(stack.length>to){o+='</ul>';stack.pop()}};
+  const inl=x=>x.replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');
+  lines.forEach(L=>{
+    let m;
+    if(/^\s*\|/.test(L)){closeL(0);if(/^\s*\|[\s:\-|]+\|\s*$/.test(L))return;
+      const c=L.trim().replace(/^\||\|$/g,'').split('|').map(x=>inl(x.trim()));
+      if(!inT){o+='<table>';inT=1;o+='<tr>'+c.map(x=>`<th>${x}</th>`).join('')+'</tr>'}else o+='<tr>'+c.map(x=>`<td>${x}</td>`).join('')+'</tr>';return}
+    if(inT){o+='</table>';inT=0}
+    if(m=L.match(/^(\s*)[-*•]\s+(.*)/)){const lv=Math.floor(m[1].length/2)+1;
+      while(stack.length<lv){o+='<ul>';stack.push(1)}closeL(lv);o+=`<li>${inl(m[2])}</li>`;return}
+    closeL(0);
+    if(m=L.match(/^#{1,4}\s*(.*)/))o+=`<h3>${inl(m[1])}</h3>`;
+    else if(L.trim())o+=`<p style="margin:6px 0">${inl(L)}</p>`;
+  });
+  closeL(0);if(inT)o+='</table>';return o;
+}
+function show(text,done){
+  const el=$('out');
+  if(cur.md&&done){el.className='out'+(cur.tree?' tree':'');el.innerHTML=md(text,cur.tree)}
+  else{el.className='out pre';el.textContent=text}
+}
+const b64=f=>new Promise((ok,no)=>{const r=new FileReader();r.onload=()=>ok(r.result.split(',')[1]);r.onerror=()=>no(new Error('檔案讀取失敗'));r.readAsDataURL(f)});
+async function imgB64(f){
+  let src;
+  try{src=await createImageBitmap(f)}
+  catch(_){
+    const u=await new Promise((ok,no)=>{const r=new FileReader();r.onload=()=>ok(r.result);r.onerror=no;r.readAsDataURL(f)});
+    src=await new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=()=>no(new Error('load'));i.src=u});
+  }
+  const w=src.width,h=src.height,k=Math.min(1,1600/Math.max(w,h));
+  const c=document.createElement('canvas');c.width=Math.max(1,Math.round(w*k));c.height=Math.max(1,Math.round(h*k));
+  const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(src,0,0,c.width,c.height);
+  return c.toDataURL('image/jpeg',0.85).split(',')[1];
+}
+async function readFiles(list){
+  const files=[];let extra="";
+  if(list.length>3)throw new Error('最多上傳 3 個檔案');
+  for(const f of list){
+    const ext=(f.name.split('.').pop()||'').toLowerCase();
+    if(f.type.startsWith('image/')||['jpg','jpeg','png','webp','heic','heif'].includes(ext)){
+      try{files.push({mime:'image/jpeg',data:await imgB64(f)})}
+      catch(err){
+        const mt=f.type||({heic:'image/heic',heif:'image/heif',png:'image/png',webp:'image/webp',jpg:'image/jpeg',jpeg:'image/jpeg'})[ext];
+        if(['image/heic','image/heif','image/png','image/webp','image/jpeg'].includes(mt)&&f.size<=6e6)files.push({mime:mt,data:await b64(f)});
+        else throw new Error('此圖片無法讀取（'+(f.type||ext)+'，'+Math.round(f.size/1024)+'KB）。若檔案超過 6MB，請先縮小或截圖後再上傳');
+      }
+    }
+    else if(f.type==='application/pdf'){if(f.size>6e6)throw new Error('PDF 請小於 6MB');files.push({mime:'application/pdf',data:await b64(f)})}
+    else if(f.type.startsWith('text/')||/\.(txt|md)$/i.test(f.name))extra+=(await f.text()).slice(0,8000)+'\n';
+    else throw new Error('不支援此格式，請改用圖片、PDF 或 TXT（Word 檔請先另存成 PDF）');
+  }
+  return {files,extra};
+}
+let psz=0;
+function fit(){const el=$('pt');let z=Math.floor(innerHeight/9);el.style.fontSize=z+'px';while(z>16&&el.scrollWidth>el.clientWidth+2){z-=2;el.style.fontSize=z+'px'}psz=z}
+function openProj(){$('pt').textContent=last;$('proj').classList.add('on');(document.documentElement.requestFullscreen||(()=>Promise.resolve())).call(document.documentElement).catch(()=>{});setTimeout(fit,60)}
+function closeProj(){$('proj').classList.remove('on');if(document.fullscreenElement)document.exitFullscreen().catch(()=>{})}
+$('pj').onclick=openProj;$('px').onclick=closeProj;
+$('pp').onclick=()=>{psz+=4;$('pt').style.fontSize=psz+'px'};$('pm').onclick=()=>{psz=Math.max(14,psz-4);$('pt').style.fontSize=psz+'px'};
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeProj()});
+document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement)$('proj').classList.remove('on')});
+addEventListener('resize',()=>{if($('proj').classList.contains('on'))fit()});
+const SC=["孩子受傷","突發疾病","同儕衝突","情緒困擾","嚴重違規","忘記物品","學習進度落後","3C/網路問題","需家長到校","回應家長訊息"];
+function paUI(){
+  const PH={AI:"請輸入發生了什麼事，或貼上家長的訊息，AI 將為您自動判斷情境並產生專業回覆…",M:"請先在上方點選情境，然後在此簡述細節或貼上家長訊息…"};
+  $('tool').innerHTML=`<div class="pa" id="pa" data-th="dark">
+  <div class="pah"><div class="pat">💬 回覆家長萬事通</div><button type="button" id="pth" title="切換亮／暗">☀️</button></div>
+  <div class="seg"><button type="button" class="on" data-m="AI智慧判斷情境">✦ AI 智慧判斷情境</button><button type="button" data-m="手動選擇情境">⚙ 手動選擇情境</button></div>
+  <div class="sc" id="scs" hidden>${SC.map(x=>`<button type="button" class="sb" data-s="${x}">${x}</button>`).join('')}</div>
+  <label class="pl" for="f_msg">✎ 描述現況或貼上訊息</label>
+  <textarea id="f_msg" placeholder="${PH.AI}"></textarea>
+  <input type="hidden" id="f_mode" value="AI智慧判斷情境"><input type="hidden" id="f_sc" value="">
+  <button class="go" id="go" data-l="💬 產生回覆建議">💬 產生回覆建議</button><p class="warn" id="err" hidden></p>
+  <details><summary>🔍 查看這個工具的提示詞設計</summary><pre>${esc(cur.r+"\n\n"+COMMON)}</pre></details></div>`;
+  const pa=$('pa');
+  pa.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{
+    pa.querySelectorAll('.seg button').forEach(x=>x.classList.toggle('on',x===b));
+    const man=b.dataset.m==='手動選擇情境';$('f_mode').value=b.dataset.m;$('scs').hidden=!man;
+    $('f_msg').placeholder=man?PH.M:PH.AI;if(!man)$('f_sc').value=''});
+  pa.querySelectorAll('.sb').forEach(b=>b.onclick=()=>{
+    pa.querySelectorAll('.sb').forEach(x=>x.classList.toggle('on',x===b));$('f_sc').value=b.dataset.s});
+  $('pth').onclick=()=>{const l=pa.dataset.th==='dark';pa.dataset.th=l?'light':'dark';$('pth').textContent=l?'🌙':'☀️'};
+  $('go').onclick=gen;
+}
+async function gen(){
+  const err=$('err');err.hidden=true;
+  if(cur.id==='pa'){
+    if($('f_mode').value==='手動選擇情境'&&!$('f_sc').value){err.textContent='請先選擇一個情境。';err.hidden=false;return}
+    if(!$('f_msg').value.trim()){err.textContent='請先描述現況或貼上訊息。';err.hidden=false;return}
+  }
+  const fields=cur.f.filter(f=>f[2]!=="file");
+  const vals=fields.map(f=>[f[1],$('f_'+f[0]).value.trim()]);
+  const fin=cur.f.find(f=>f[2]==="file");let files=[],extra="";
+  if(fin){try{({files,extra}=await readFiles($('f_'+fin[0]).files))}catch(e){err.textContent=e.message||'檔案讀取失敗';err.hidden=false;return}}
+  if(!vals.some((v,i)=>fields[i][2]!=="sel"&&v[1])&&!files.length&&!extra){err.textContent='請先填寫內容。';err.hidden=false;return}
+  const prompt=`${cur.r}\n${COMMON}\n${cur.md?'可使用 Markdown 格式。':'請輸出純文字，不要使用 Markdown 符號。'}\n\n【使用者輸入】\n`+vals.map(v=>`${v[0]}：${v[1]||'（未提供）'}`).join('\n')+(extra?'\n【上傳的文字檔內容】\n'+extra:'')+(files.length?'\n（另附上傳的圖片或檔案，請先辨識其中內容並作為主要來源；若是手寫或拍照，看不清楚處請以【?】標示。）':'');
+  const go=$('go');go.disabled=true;go.textContent='生成中…';$('again').disabled=true;
+  $('resCard').hidden=false;show('思考中…',false);
+  try{
+    if(API_URL.includes('請換成'))throw new Error('PLACEHOLDER');
+    const res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt,files})});
+    const j=await res.json().catch(()=>({}));if(!res.ok||!j.text)throw Object.assign(new Error(j.error||'error'),{detail:j.detail,status:res.status});
+    last=j.text.trim();show(last,true);
+  }catch(e){
+    $('resCard').hidden=true;
+    let m;
+    if(e.message==='PLACEHOLDER')m='網頁裡的 API_URL 還沒換成你的 Worker 網址。';
+    else if(e instanceof TypeError)m='連不到 Worker：請檢查 API_URL 是否正確，以及 Worker 的 ALLOWED_ORIGIN 是否和網站網址一致。';
+    else m='生成失敗（'+(e.status||'')+' '+(e.message||'')+'）'+(e.detail?'：'+e.detail:'');
+    err.textContent=m;err.hidden=false;
+  }finally{go.disabled=false;go.textContent=go.dataset.l||'✨ 開始生成';$('again').disabled=false}
+}
+$('again').onclick=gen;
+$('copy').onclick=async()=>{
+  try{await navigator.clipboard.writeText(last)}catch(e){const r=document.createRange();r.selectNodeContents($('out'));const s=getSelection();s.removeAllRanges();s.addRange(r);document.execCommand('copy')}
+  $('copy').textContent='✅ 已複製';setTimeout(()=>$('copy').textContent='📋 複製',1500)
+};
+pick(T[0]);
+if(SURVEY_URL){$('svl').href=SURVEY_URL;$('sv').hidden=false}
+</script>
+</body>
+</html>
